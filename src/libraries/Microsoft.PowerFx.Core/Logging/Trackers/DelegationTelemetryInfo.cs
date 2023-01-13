@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+using System.Xml.Linq;
 using Microsoft.PowerFx.Core.Binding;
 using Microsoft.PowerFx.Core.Binding.BindInfo;
 using Microsoft.PowerFx.Core.Entities;
 using Microsoft.PowerFx.Core.Functions;
+using Microsoft.PowerFx.Core.Types;
 using Microsoft.PowerFx.Core.Utils;
 using Microsoft.PowerFx.Syntax;
 
@@ -12,14 +14,17 @@ namespace Microsoft.PowerFx.Core.Logging.Trackers
 {
     internal sealed class DelegationTelemetryInfo
     {
-        private DelegationTelemetryInfo(string info)
+        private DelegationTelemetryInfo(string info, string dataSourceName = null)
         {
             Contracts.AssertValue(info);
 
             Info = info;
+            DataSourceName = dataSourceName;
         }
 
         public string Info { get; }
+
+        public string DataSourceName { get; }
 
         public static DelegationTelemetryInfo CreateEmptyDelegationTelemetryInfo()
         {
@@ -83,6 +88,29 @@ namespace Microsoft.PowerFx.Core.Logging.Trackers
                 default:
                     return new DelegationTelemetryInfo(node.ToString());
             }
+        }
+
+        public static DelegationTelemetryInfo CreateDelegationSuccessfulTelemetryInfo(IExternalDataSource externalDataSource)
+        {
+            return new DelegationTelemetryInfo(string.Empty, externalDataSource?.Name);
+        }
+
+        public static DelegationTelemetryInfo CreateUnSupportedSortArgTelemetryInfo(TexlNode arg, IExternalDataSource externalDataSource)
+        {
+            Contracts.AssertValue(arg);
+            Contracts.AssertValueOrNull(externalDataSource);
+
+            return new DelegationTelemetryInfo(arg.Kind.ToString(), externalDataSource?.Name);
+        }
+
+        public static DelegationTelemetryInfo CreateInvalidArgTypeTelemetryInfo(DType argType, IExternalDataSource externalDataSource)
+        {
+            Contracts.AssertValue(argType);
+            Contracts.AssertValueOrNull(externalDataSource);
+
+            return new DelegationTelemetryInfo(argType.Kind.ToString(), externalDataSource?.Name);
+
+
         }
     }
 }

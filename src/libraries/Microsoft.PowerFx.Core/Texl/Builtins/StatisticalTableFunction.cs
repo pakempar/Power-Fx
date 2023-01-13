@@ -59,7 +59,8 @@ namespace Microsoft.PowerFx.Core.Texl.Builtins
                 return false;
             }
 
-            if (!TryGetValidDataSourceForDelegation(callNode, binding, FunctionDelegationCapability, out var dataSource))
+            IExternalDataSource dataSource = null;
+            if (!TryGetValidDataSourceForDelegation(callNode, binding, FunctionDelegationCapability, out dataSource))
             {
                 if (dataSource != null && dataSource.IsDelegatable)
                 {
@@ -80,11 +81,11 @@ namespace Microsoft.PowerFx.Core.Texl.Builtins
 
                 if (binding.GetType(args[1]) != DType.Number)
                 {
-                    TrackingProvider.Instance.SetDelegationTrackerStatus(DelegationStatus.NotANumberArgType, callNode, binding, this, DelegationTelemetryInfo.CreateEmptyDelegationTelemetryInfo());
+                    TrackingProvider.Instance.SetDelegationTrackerStatus(DelegationStatus.NotANumberArgType, callNode, binding, this, DelegationTelemetryInfo.CreateInvalidArgTypeTelemetryInfo(binding.GetType(args[1]), dataSource));
                 }
                 else
                 {
-                    TrackingProvider.Instance.SetDelegationTrackerStatus(DelegationStatus.InvalidArgType, callNode, binding, this, DelegationTelemetryInfo.CreateEmptyDelegationTelemetryInfo());
+                    TrackingProvider.Instance.SetDelegationTrackerStatus(DelegationStatus.InvalidArgType, callNode, binding, this, DelegationTelemetryInfo.CreateInvalidArgTypeTelemetryInfo(binding.GetType(args[1]), dataSource));
                 }
 
                 return false;

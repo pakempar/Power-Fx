@@ -134,6 +134,7 @@ namespace Microsoft.PowerFx.Core.Texl.Builtins
             }
 
             SortOpMetadata metadata = null;
+            IExternalDataSource dataSource = null;
             if (TryGetEntityMetadata(callNode, binding, out IDelegationMetadata delegationMetadata))
             {
                 if (!binding.Document.Properties.EnabledFeatures.IsEnhancedDelegationEnabled ||
@@ -147,7 +148,7 @@ namespace Microsoft.PowerFx.Core.Texl.Builtins
             }
             else
             {
-                if (!TryGetValidDataSourceForDelegation(callNode, binding, DelegationCapability.Sort, out var dataSource))
+                if (!TryGetValidDataSourceForDelegation(callNode, binding, DelegationCapability.Sort, out dataSource))
                 {
                     return false;
                 }
@@ -165,7 +166,7 @@ namespace Microsoft.PowerFx.Core.Texl.Builtins
             {
                 SuggestDelegationHint(arg1, binding);
                 AddSuggestionMessageToTelemetry("Arg1 is not a FirstName node.", arg1, binding);
-                TrackingProvider.Instance.SetDelegationTrackerStatus(DelegationStatus.UnSupportedSortArg, arg1, binding, this, DelegationTelemetryInfo.CreateEmptyDelegationTelemetryInfo());
+                TrackingProvider.Instance.SetDelegationTrackerStatus(DelegationStatus.UnSupportedSortArg, arg1, binding, this, DelegationTelemetryInfo.CreateUnSupportedSortArgTelemetryInfo(arg1, dataSource));
                 return false;
             }
 
